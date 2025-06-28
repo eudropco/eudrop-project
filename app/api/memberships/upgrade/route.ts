@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
+import { getCurrentUser } from '@/lib/session'; // Merkezi fonksiyonumuzu kullanıyoruz
 import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const token = cookieStore.get('session_token');
+  // Kullanıcıyı bulma işini merkezi fonksiyonumuza bırakıyoruz.
+  const user = await getCurrentUser();
 
-  if (!token) {
+  if (!user) {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
   }
 
@@ -17,22 +16,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const decoded = jwt.verify(token.value, 'BU-COK-GIZLI-BIR-ANAHTAR-OLMALI-NORMALDE');
-    if (typeof decoded === 'string' || !decoded.userId) {
-      throw new Error('Invalid token');
-    }
-
-    // Kullanıcının üyelik seviyesini veritabanında güncelliyoruz
-    const updatedUser = await prisma.user.update({
-      where: { id: decoded.userId },
+    // Veritabanında kullanıcının üyelik seviyesini güncelliyoruz.
+    await prisma.user.update({
+      where: { id: user.id },
       data: { membershipTier: newTier },
     });
 
-    console.log(`User ${updatedUser.username} upgraded to ${newTier}`);
-
+    console.log(`SUCCESS: User ${user.username} upgraded to ${newTier}.`);
     return NextResponse.json({ success: true, message: `Successfully upgraded to ${newTier}!` });
 
   } catch (error) {
-    return NextResponse.json({ message: 'Authentication failed or user not found' }, { status: 401 });
+    console.error(error);
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
