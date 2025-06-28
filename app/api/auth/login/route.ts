@@ -1,10 +1,8 @@
-export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { sealData } from 'iron-session';
+import jwt from 'jsonwebtoken';
 
-// Bu, cookie ayarlarını önceden tanımlamamızı sağlar
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -26,18 +24,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    const sessionPassword = process.env.JWT_SECRET!;
-    
-    const sealedSession = await sealData({ userId: user.id }, {
-      password: sessionPassword,
-      ttl: 60 * 60 * 24,
+    const secret = process.env.JWT_SECRET!;
+
+    // 1. JWT anahtarını oluştur
+    const token = jwt.sign({ userId: user.id, email: user.email }, secret, {
+      expiresIn: '1d',
     });
 
-    // DOĞRU YÖNTEM: NextResponse objesini oluşturup,
-    // onun üzerinden cookie'yi ayarlıyoruz.
+    // 2. Cevabı oluştur ve cookie'yi ayarla
     const response = NextResponse.json({ success: true, message: 'Login successful!' });
-
-    response.cookies.set('session', sealedSession, cookieOptions);
+    response.cookies.set('session_token', token, cookieOptions);
 
     return response;
 
