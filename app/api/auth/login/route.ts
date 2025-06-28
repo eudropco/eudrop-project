@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const sessionPassword = process.env.JWT_SECRET!;
-
+    
     const sealedSession = await sealData({ userId: user.id }, {
       password: sessionPassword,
       ttl: 60 * 60 * 24,
