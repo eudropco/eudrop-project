@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import ProductCard from '../components/ProductCard';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
 // ... (type TierName ve tierBenefits objeleri aynı kalabilir) ...

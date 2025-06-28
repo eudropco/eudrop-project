@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth'; // Ayarları merkezi dosyamızdan çekiyoruz
+import { authOptions } from '@/lib/auth';
 
 
 export default async function AdminLayout({
