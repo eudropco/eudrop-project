@@ -1,24 +1,44 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Bu bilgileri normalde bir veritabanından çekeriz, şimdilik burada tutuyoruz.
-const products = [
+// Ürünlerimizin tipini tanımlıyoruz
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+};
+
+// Sayfanın alacağı props'ların tipini burada açıkça belirtiyoruz. Hata buydu.
+type Props = {
+  params: { productSlug: string };
+};
+
+// Ürün listesini bileşenin dışında tutmak daha iyi bir pratiktir
+const products: Product[] = [
   { id: 'netflix-premium', name: 'Netflix Premium', price: 12.99, imageUrl: 'https://i.imgur.com/ww3zP1w.png' },
   { id: 'spotify-premium', name: 'Spotify Premium', price: 9.99, imageUrl: 'https://i.imgur.com/J1ca42Y.png' },
-  // ... Diğer ürünler
+  { id: 'youtube-premium', name: 'YouTube Premium', price: 11.99, imageUrl: 'https://i.imgur.com/Sj5eD2z.png' },
+  { id: 'xbox-game-pass', name: 'Xbox Game Pass', price: 14.99, imageUrl: 'https://i.imgur.com/K3a2i4B.png' },
+  { id: 'discord-nitro', name: 'Discord Nitro', price: 9.99, imageUrl: 'https://i.imgur.com/C5m3s1B.png' },
+  { id: 'disney-plus', name: 'Disney+', price: 7.99, imageUrl: 'https://i.imgur.com/4a0gJb2.png' },
 ];
 
-export default function ProductDetailPage({ params }: { params: { productSlug: string } }) {
-  const [orderType, setOrderType] = useState('new'); // 'new' ya da 'upgrade'
+export default function ProductDetailPage({ params }: Props) {
+  const [orderType, setOrderType] = useState('new');
   const [existingUsername, setExistingUsername] = useState('');
   const [existingPassword, setExistingPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [product, setProduct] = useState<Product | undefined>(undefined);
 
-  const product = products.find(p => p.id === params.productSlug);
+  useEffect(() => {
+    const foundProduct = products.find(p => p.id === params.productSlug);
+    setProduct(foundProduct);
+  }, [params.productSlug]);
 
   if (!product) {
-    return <div className="text-white text-center p-10">Product not found.</div>;
+    return <div className="text-white text-center p-10 min-h-screen flex items-center justify-center">Loading product...</div>;
   }
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -27,7 +47,7 @@ export default function ProductDetailPage({ params }: { params: { productSlug: s
 
     const orderData = {
       productName: product.name,
-      price: product.price, // İleride indirimli fiyatı da ekleyeceğiz
+      price: product.price,
       orderType: orderType,
       existingUsername: orderType === 'upgrade' ? existingUsername : undefined,
       existingPassword: orderType === 'upgrade' ? existingPassword : undefined,
