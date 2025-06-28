@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { headers } from 'next/headers';
+// Artık 'next/headers'a ihtiyacımız yok.
 import prisma from '@/lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
-  apiVersion: '2025-05-28.basil', // Düzeltilmiş versiyon
+  apiVersion: '2025-05-28.basil', // Bu versiyonu doğru bırakıyoruz
 });
 
 const relevantEvents = new Set([
@@ -13,7 +13,8 @@ const relevantEvents = new Set([
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get('stripe-signature') as string;
+  // DÜZELTME: İmza'yı 'headers()' yerine doğrudan 'request.headers'tan alıyoruz.
+  const signature = request.headers.get('stripe-signature') as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
   let event: Stripe.Event;
@@ -39,11 +40,12 @@ export async function POST(request: Request) {
 
         let newTier = 'Free';
         // Not: Buradaki price ID'leri sizin CANLI moddaki ID'leriniz olmalı.
-        if (priceId === 'price_...') { // Netrunner Price ID
+        // Bu ID'leri daha önce Stripe'tan alıp bir yere kaydetmiştiniz.
+        if (priceId === 'price_...') { // Sizin Netrunner Price ID'niz
             newTier = 'Netrunner';
-        } else if (priceId === 'price_...') { // Street Samurai Price ID
+        } else if (priceId === 'price_...') { // Sizin Street Samurai Price ID'niz
             newTier = 'Street Samurai';
-        } else if (priceId === 'price_...') { // Fixer Price ID
+        } else if (priceId === 'price_...') { // Sizin Fixer Price ID'niz
             newTier = 'Fixer';
         }
 
