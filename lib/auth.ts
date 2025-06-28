@@ -7,6 +7,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from 'bcryptjs';
 import { User } from "@prisma/client";
 
+// Bütün ayarları bu dosyadan export ediyoruz.
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -17,22 +18,11 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-        if (!user) {
-          return null;
-        }
-        const isPasswordCorrect = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-        if (isPasswordCorrect) {
-          return user;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
+        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        if (!user) return null;
+        const isPasswordCorrect = await bcrypt.compare(credentials.password, user.hashedPassword);
+        if (isPasswordCorrect) return user;
         return null;
       }
     })

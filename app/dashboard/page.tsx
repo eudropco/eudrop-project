@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../api/auth/[...nextauth]/route'; // Auth motorumuzu import ediyoruz
+import { authOptions } from '@/lib/auth'; // Ayarları merkezi dosyamızdan çekiyoruz
 
 type TierName = 'Fixer' | 'Street Samurai' | 'Netrunner' | 'Free' | 'Admin';
 
