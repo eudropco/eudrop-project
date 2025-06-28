@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/session';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../api/auth/[...nextauth]/route'; // Auth motorumuzu import ediyoruz
 
 type TierName = 'Fixer' | 'Street Samurai' | 'Netrunner' | 'Free' | 'Admin';
 
@@ -13,30 +14,25 @@ const tierBenefits: Record<TierName, { discount: string; tokens: string; support
 };
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser();
+  // İşte doğru oturum kontrolü:
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
-    redirect('/');
+  if (!session || !session.user) {
+    redirect('/'); 
   }
-  
+
+  const user = session.user;
   const currentUserBenefits = tierBenefits[user.membershipTier as TierName];
 
   if (!currentUserBenefits) {
-    return (
-      <div className="text-white p-8 text-center">
-        <h1>Error: Unknown membership tier. Please contact support.</h1>
-        <Link href="/"><span className="text-cyan-400 hover:underline">Go back to Home</span></Link>
-      </div>
-    );
+    return <div className="text-white p-8 text-center">Error: Unknown membership tier.</div>
   }
 
   return (
     <main className="min-h-screen w-full bg-[#0A0E1A] text-white font-sans p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-widest uppercase" style={{fontFamily: 'Orbitron, sans-serif'}}>
-            EUDROP
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-widest uppercase" style={{fontFamily: 'Orbitron, sans-serif'}}>EUDROP</h1>
           <div className="text-right">
             <p className="text-gray-400">Welcome back,</p>
             <p className="text-lg font-semibold text-cyan-400">{user.username}</p>
