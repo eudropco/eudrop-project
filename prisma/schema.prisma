@@ -1,0 +1,36 @@
+// Bu, Prisma'nın veritabanı ile nasıl konuşacağını tanımlayan ana yapılandırma dosyasıdır.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Veritabanı adresini .env dosyasından okur
+}
+
+// --- BİZİM VERİTABANI MODELLERİMİZ ---
+
+// Kullanıcılar tablosunun planı
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  username        String    @unique
+  hashedPassword  String
+  membershipTier  String    @default("Free")
+  registrationIp  String?
+  lastLoginIp     String?
+  approxLocation  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  sessions        Session[] // Bir kullanıcının birden çok oturumu olabilir
+}
+
+// Kullanıcı giriş oturumlarını saklayacak olan tablo
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
