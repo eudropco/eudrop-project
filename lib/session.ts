@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { cookies } from 'next/headers';
 import { unsealData } from 'iron-session'; // Daha güvenli bir oturum yönetimi için farklı bir yaklaşım kullanacağız
 import { User } from '@prisma/client';

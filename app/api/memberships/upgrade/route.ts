@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/session'; // Merkezi fonksiyonumuzu kullanıyoruz
 import prisma from '@/lib/prisma';

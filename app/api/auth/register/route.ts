@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma'; // Oluşturduğumuz paylaşılan bağlantıyı çağırıyoruz
 import bcrypt from 'bcryptjs';
