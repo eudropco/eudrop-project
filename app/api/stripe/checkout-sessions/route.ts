@@ -6,7 +6,8 @@ import { authOptions } from '@/lib/auth';
 export const runtime = 'nodejs';
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
-  apiVersion: '2024-06-20',
+  // DOĞRU API VERSİYONU
+  apiVersion: '2025-05-28.basil',
 });
 
 export async function POST(request: Request) {
