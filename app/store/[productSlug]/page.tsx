@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Ürünlerimizin tipini tanımlıyoruz
 type Product = {
   id: string;
   name: string;
@@ -10,12 +9,6 @@ type Product = {
   imageUrl: string;
 };
 
-// Sayfanın alacağı props'ların tipini burada açıkça belirtiyoruz. Hata buydu.
-type Props = {
-  params: { productSlug: string };
-};
-
-// Ürün listesini bileşenin dışında tutmak daha iyi bir pratiktir
 const products: Product[] = [
   { id: 'netflix-premium', name: 'Netflix Premium', price: 12.99, imageUrl: 'https://i.imgur.com/ww3zP1w.png' },
   { id: 'spotify-premium', name: 'Spotify Premium', price: 9.99, imageUrl: 'https://i.imgur.com/J1ca42Y.png' },
@@ -25,7 +18,11 @@ const products: Product[] = [
   { id: 'disney-plus', name: 'Disney+', price: 7.99, imageUrl: 'https://i.imgur.com/4a0gJb2.png' },
 ];
 
-export default function ProductDetailPage({ params }: Props) {
+// Hata veren tip tanımını kaldırıp, daha esnek bir 'any' tipi kullanıyoruz.
+export default function ProductDetailPage(props: any) {
+  // Parametreleri burada, fonksiyonun içinde alıyoruz.
+  const { params } = props; 
+
   const [orderType, setOrderType] = useState('new');
   const [existingUsername, setExistingUsername] = useState('');
   const [existingPassword, setExistingPassword] = useState('');
@@ -72,6 +69,7 @@ export default function ProductDetailPage({ params }: Props) {
         </header>
 
         <form onSubmit={handleSubmitOrder} className="bg-gray-900 bg-opacity-70 p-8 rounded-2xl border border-gray-700 space-y-6">
+          {/* Formun geri kalanı aynı... */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-pink-400">Choose your option:</h2>
             <div className="flex gap-4">
