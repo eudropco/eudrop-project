@@ -4,15 +4,15 @@ import prisma from '@/lib/prisma';
 import { User } from '@prisma/client';
 
 export async function getCurrentUser(): Promise<User | null> {
-  const cookieStore = cookies();
-  const token = cookieStore.get('session_token');
+  const tokenCookie = cookies().get('session_token');
+  const secret = process.env.JWT_SECRET;
 
-  if (!token) {
+  if (!tokenCookie || !secret) {
     return null;
   }
 
   try {
-    const decoded = jwt.verify(token.value, 'BU-COK-GIZLI-BIR-ANAHTAR-OLMALI-NORMALDE');
+    const decoded = jwt.verify(tokenCookie.value, secret);
     if (typeof decoded === 'string' || !decoded.userId) {
       return null;
     }
