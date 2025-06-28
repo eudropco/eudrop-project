@@ -1,6 +1,6 @@
 import { getIronSession } from 'iron-session';
 // DEĞİŞİKLİK 1: 'type CookieStore' eklendi.
-import { cookies, type CookieStore } from 'next/headers';
+import { cookies } from 'next/headers';
 import { User } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
@@ -21,7 +21,7 @@ export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = cookies();
     
     // DEĞİŞİKLİK 2: 'as CookieStore' eklenerek tip zorlaması yapıldı.
-    const session = await getIronSession<SessionData>(cookieStore as CookieStore, sessionOptions);
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
     if (!session.userId) {
       return null;
