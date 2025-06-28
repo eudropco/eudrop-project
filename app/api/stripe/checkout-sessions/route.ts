@@ -1,33 +1,36 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getCurrentUser } from '@/lib/session';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]/route';
+
+export const runtime = 'nodejs';
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
-  apiVersion: '2025-05-28.basil', // Düzeltilmiş versiyon
+  apiVersion: '2024-06-20',
 });
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
   const { priceId } = await request.json();
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'subscription',
-      customer_email: user.email,
+      customer_email: session.user.email!,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard?payment_success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}/memberships`,
       metadata: {
-        userId: user.id,
+        userId: session.user.id,
       }
     });
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

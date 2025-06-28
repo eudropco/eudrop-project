@@ -1,34 +1,36 @@
-import ProductCard from '../components/ProductCard';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/session'; // Aynı merkezi fonksiyonu burada da kullanıyoruz
+import ProductCard from '../components/ProductCard';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
-type TierName = 'Fixer' | 'Street Samurai' | 'Netrunner' | 'Free';
+// ... (type TierName ve tierBenefits objeleri aynı kalabilir) ...
+type TierName = 'Fixer' | 'Street Samurai' | 'Netrunner' | 'Free' | 'Admin';
 const tierBenefits: Record<TierName, { discountRate: number }> = {
-  'Fixer': { discountRate: 0.30 },
-  'Street Samurai': { discountRate: 0.15 },
-  'Netrunner': { discountRate: 0.05 },
-  'Free': { discountRate: 0 }
+    'Admin': { discountRate: 1.0 }, // 100%
+    'Fixer': { discountRate: 0.30 },
+    'Street Samurai': { discountRate: 0.15 },
+    'Netrunner': { discountRate: 0.05 },
+    'Free': { discountRate: 0 }
 };
-
 const products = [
-  { id: 'netflix-premium', name: 'Netflix Premium', price: 12.99, imageUrl: 'https://i.imgur.com/ww3zP1w.png' },
-  { id: 'spotify-premium', name: 'Spotify Premium', price: 9.99, imageUrl: 'https://i.imgur.com/J1ca42Y.png' },
-  // ... Diğer ürünler aynı ...
-  { id: 'youtube-premium', name: 'YouTube Premium', price: 11.99, imageUrl: 'https://i.imgur.com/Sj5eD2z.png' },
-  { id: 'xbox-game-pass', name: 'Xbox Game Pass', price: 14.99, imageUrl: 'https://i.imgur.com/K3a2i4B.png' },
-  { id: 'discord-nitro', name: 'Discord Nitro', price: 9.99, imageUrl: 'https://i.imgur.com/C5m3s1B.png' },
-  { id: 'disney-plus', name: 'Disney+', price: 7.99, imageUrl: 'https://i.imgur.com/4a0gJb2.png' },
+    { id: 'netflix-premium', name: 'Netflix Premium', price: 12.99, imageUrl: 'https://i.imgur.com/ww3zP1w.png' },
+    { id: 'spotify-premium', name: 'Spotify Premium', price: 9.99, imageUrl: 'https://i.imgur.com/J1ca42Y.png' },
+    { id: 'youtube-premium', name: 'YouTube Premium', price: 11.99, imageUrl: 'https://i.imgur.com/Sj5eD2z.png' },
+    { id: 'xbox-game-pass', name: 'Xbox Game Pass', price: 14.99, imageUrl: 'https://i.imgur.com/K3a2i4B.png' },
+    { id: 'discord-nitro', name: 'Discord Nitro', price: 9.99, imageUrl: 'https://i.imgur.com/C5m3s1B.png' },
+    { id: 'disney-plus', name: 'Disney+', price: 7.99, imageUrl: 'https://i.imgur.com/4a0gJb2.png' },
 ];
 
 export default async function StorePage() {
-  const user = await getCurrentUser();
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
-    redirect('/'); // Giriş yapmamışsa anasayfaya at
+  if (!session || !session.user) {
+    redirect('/');
   }
 
-  const userDiscountRate = tierBenefits[user.membershipTier as TierName]?.discountRate || 0;
+  const user = session.user;
+  const userDiscountRate = tierBenefits[user.membershipTier as TierName]?.discountRate ?? 0;
 
   return (
     <main className="min-h-screen w-full bg-[#0A0E1A] text-white font-sans p-4 sm:p-6 md:p-8">

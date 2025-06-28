@@ -1,13 +1,14 @@
-export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/session'; // Merkezi fonksiyonumuzu kullanıyoruz
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-export async function POST(request: Request) {
-  // Kullanıcıyı bulma işini merkezi fonksiyonumuza bırakıyoruz.
-  const user = await getCurrentUser();
+export const runtime = 'nodejs';
 
-  if (!user) {
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
   }
 
@@ -17,13 +18,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Veritabanında kullanıcının üyelik seviyesini güncelliyoruz.
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: session.user.id },
       data: { membershipTier: newTier },
     });
 
-    console.log(`SUCCESS: User ${user.username} upgraded to ${newTier}.`);
+    console.log(`SUCCESS: User ${session.user.username} upgraded to ${newTier}.`);
     return NextResponse.json({ success: true, message: `Successfully upgraded to ${newTier}!` });
 
   } catch (error) {
