@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { getCurrentUser } from '@/lib/session';
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-05-28.basil', // Düzeltilmiş versiyon
 });
 
 export async function POST(request: Request) {

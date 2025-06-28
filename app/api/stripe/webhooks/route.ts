@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-05-28.basil', // Düzeltilmiş versiyon
 });
 
 const relevantEvents = new Set([
