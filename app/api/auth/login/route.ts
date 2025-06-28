@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { sealData } from 'iron-session'; // jwt yerine iron-session'ın sealData'sını kullanıyoruz
-import { cookies } from 'next/headers';
+import { sealData } from 'iron-session';
+
+// Bu, cookie ayarlarını önceden tanımlamamızı sağlar
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 60 * 60 * 24, // 1 gün
+  path: '/',
+};
 
 export async function POST(request: Request) {
   try {
@@ -20,21 +27,19 @@ export async function POST(request: Request) {
 
     const sessionPassword = process.env.JWT_SECRET!;
 
-    // Kullanıcı ID'sini şifreleyip bir "mühür" oluşturuyoruz.
     const sealedSession = await sealData({ userId: user.id }, {
       password: sessionPassword,
-      ttl: 60 * 60 * 24, // 1 gün
+      ttl: 60 * 60 * 24,
     });
 
-    // Bu mühürlenmiş veriyi cookie olarak ayarlıyoruz.
-    cookies().set('session', sealedSession, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24,
-      path: '/',
-    });
+    // DOĞRU YÖNTEM: NextResponse objesini oluşturup,
+    // onun üzerinden cookie'yi ayarlıyoruz.
+    const response = NextResponse.json({ success: true, message: 'Login successful!' });
 
-    return NextResponse.json({ success: true, message: 'Login successful!' });
+    response.cookies.set('session', sealedSession, cookieOptions);
+
+    return response;
+
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });
