@@ -1,34 +1,30 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/session';
+import { getCurrentUser } from '@/lib/session'; // Merkezi fonksiyonumuzu kullanıyoruz
 
-// TİP TANIMINA 'Admin' EKLENDİ
+// Tipleri ve faydaları tanımlıyoruz
 type TierName = 'Fixer' | 'Street Samurai' | 'Netrunner' | 'Free' | 'Admin';
 
 const tierBenefits: Record<TierName, { discount: string; tokens: string; support: string; color: string; }> = {
-  // YENİ EKLENEN ADMIN TANIMI
   'Admin': { discount: '100%', tokens: 'Unlimited', support: 'Root Access', color: 'border-red-500' },
-
   'Fixer': { discount: '30%', tokens: '3,000,000', support: 'Priority Ticket + Private Discord', color: 'border-orange-500' },
   'Street Samurai': { discount: '15%', tokens: '1,000,000', support: 'Ticket + Private Discord', color: 'border-purple-500' },
   'Netrunner': { discount: '5%', tokens: '250,000', support: 'Ticket System', color: 'border-cyan-500' },
   'Free': { discount: '0%', tokens: '0', support: 'N/A', color: 'border-gray-600' }
 };
 
+// Bu, artık veriyi veritabanından çeken, güvenli bir sunucu bileşenidir.
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect('/');
+    redirect('/'); // Eğer kullanıcı bulunamazsa giriş sayfasına yönlendir
   }
 
   const currentUserBenefits = tierBenefits[user.membershipTier as TierName];
 
-  // Eğer bir şekilde tanımsız bir rol gelirse diye ek bir güvenlik kontrolü
   if (!currentUserBenefits) {
-    // Bu durumda kullanıcıyı logout yapıp anasayfaya atmak daha mantıklı olabilir
-    // Şimdilik basit bir mesaj gösterelim.
-    return <div>Error: Unknown membership tier.</div>
+    return <div className="text-white p-8">Error: Unknown membership tier for this user.</div>
   }
 
   return (
@@ -57,15 +53,4 @@ export default async function DashboardPage() {
             <div className="p-6 rounded-2xl bg-gray-900 bg-opacity-70 border border-gray-700">
               <h2 className="text-2xl font-bold mb-6 text-pink-400">Main Cockpit</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Link href="/store"><div className="p-4 rounded-lg bg-gray-800 text-center cursor-pointer hover:bg-cyan-900 transition h-full flex flex-col justify-center"><h3 className="text-xl font-bold">Store</h3><p className="text-gray-400 mt-1">Access A La Carte products</p></div></Link>
-                <div className="p-4 rounded-lg bg-gray-800 text-center cursor-not-allowed opacity-50 h-full flex flex-col justify-center"><h3 className="text-xl font-bold">AI Tools</h3><p className="text-gray-400 mt-1">Use your token credits</p></div>
-                <div className="p-4 rounded-lg bg-gray-800 text-center cursor-not-allowed opacity-50 h-full flex flex-col justify-center"><h3 className="text-xl font-bold">Support</h3><p className="text-gray-400 mt-1">Open a new ticket</p></div>
-                <Link href="/memberships"><div className="p-4 rounded-lg bg-green-800 text-center cursor-pointer hover:bg-green-700 transition h-full flex flex-col justify-center border-2 border-green-500"><h3 className="text-xl font-bold">Upgrade Membership</h3><p className="text-gray-400 mt-1">Unlock new tiers</p></div></Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
+                <Link href="/store"><div className="p-4 rounded-lg bg-gray-800 text-center cursor-pointer hover:bg-cyan-90

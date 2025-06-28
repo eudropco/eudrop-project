@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     // Şifre doğruysa, bir JWT (oturum anahtarı) oluşturuyoruz.
     // GERÇEK BİR PROJEDE BU SECRET, .env DOSYASINDA OLMALIDIR.
-    const JWT_SECRET = 'BU-COK-GIZLI-BIR-ANAHTAR-OLMALI-NORMALDE';
+    const JWT_SECRET = process.env.JWT_SECRET!;
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
 
     // Bu anahtarı, güvenli bir httpOnly cookie olarak tarayıcıya gönderiyoruz.
