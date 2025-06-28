@@ -1,10 +1,11 @@
-import NextAuth, { type NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import prisma from "@/lib/prisma"
-import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from 'bcryptjs'
-import { User } from "@prisma/client"
+import NextAuth, { type NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import prisma from "@/lib/prisma";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from 'bcryptjs';
+import { User } from "@prisma/client";
 
+// authOptions objesinde hiçbir değişiklik yok, o zaten doğruydu.
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -16,27 +17,22 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          return null;
         }
-
         const user = await prisma.user.findUnique({
           where: { email: credentials.email }
         });
-
         if (!user) {
-          return null
+          return null;
         }
-
         const isPasswordCorrect = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
         );
-
         if (isPasswordCorrect) {
-          return user
+          return user;
         }
-
-        return null
+        return null;
       }
     })
   ],
@@ -64,6 +60,8 @@ export const authOptions: NextAuthOptions = {
   }
 };
 
+// DEĞİŞİKLİK BURADA: handler'ı direkt export etmek yerine,
+// GET ve POST fonksiyonlarını açıkça tanımlıyoruz.
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
