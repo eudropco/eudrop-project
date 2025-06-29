@@ -1,12 +1,11 @@
-import type { Metadata } from 'next'
 import './globals.css'
+import Providers from './components/Providers' // Yeni bileşenimizi import ediyoruz
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'EuDrop',
   description: 'Welcome to EuDrop',
 }
 
-// Değişiklik burada: Fonksiyona gelen 'children' props'unun tipini belirtiyoruz.
 export default function RootLayout({
   children,
 }: {
@@ -14,7 +13,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* Tüm sayfalarımızı bu sağlayıcı ile sarmalıyoruz */}
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   )
 }
