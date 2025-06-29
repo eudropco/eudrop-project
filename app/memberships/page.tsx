@@ -5,7 +5,7 @@ import Link from 'next/link';
 const tiers = [
   { 
     name: 'Netrunner', 
-    priceId: 'price_1ReqY8IJnqxvV31e1k53UM8y', // <-- BURAYI DEĞİŞTİR: Stripe'taki Netrunner Plan'ın Fiyat ID'si
+    priceId: 'price_1RfMYnIJnqxvV31elCvi8Esx', // <-- BURAYI DEĞİŞTİR: Stripe'taki Netrunner Plan'ın Fiyat ID'si
     price: '$9.99/mo', 
     benefits: ['5% Store Discount', '250,000 AI Tokens', 'Standard Support'], 
     color: 'border-cyan-500', 
