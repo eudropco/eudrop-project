@@ -1,5 +1,3 @@
-// lib/auth.ts
-
 import { type NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
@@ -7,7 +5,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from 'bcryptjs';
 import { User } from "@prisma/client";
 
-// Bütün ayarları bu dosyadan export ediyoruz.
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -27,10 +24,11 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
   secret: process.env.JWT_SECRET,
+  pages: {
+    signIn: '/', // Giriş sayfamızın ana sayfa olduğunu belirtiyoruz
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
